@@ -1,0 +1,43 @@
+<style>
+/* Podstawowe ustawienia strony */
+html, body {
+  width: 100% !important;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+/* Kontenery główne */
+.main-container, .container, .container-fluid {
+  max-width: 100% !important;
+  height: 100% !important; 
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 0 2% !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* wyśrodkowanie */
+}
+
+/* Sekcje RMarkdown */
+.section.level2 {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Wszystkie wykresy Plotly i HTML widgets */
+.plotly, .html-widget {
+  width: 100% !important;   /* pełna szerokość */
+  min-height: 400px;        /* minimalna wysokość wykresu */
+  height: 100% !important;  /* automatyczna wysokość, nie ściśnięta */
+  display: block;
+  margin: 0 auto;
+}
+
+/* Tytuły wykresów */
+h2, h3, h4 {
+  text-align: center;
+}
+</style>
