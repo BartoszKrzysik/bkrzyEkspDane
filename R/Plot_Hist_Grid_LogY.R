@@ -16,23 +16,17 @@
 #'
 #' @export
 plot_hist_grid_logY <- function(df, factor_cols = NULL, bins = 20) {
-  if (is.null(factor_cols) || length(factor_cols) == 0) {
-    df$All <- "All"
-    factor_cols <- "All"
-  }
+  prep <- prepare_qualitative(df, factor_cols)
+  df_local <- prep$df
+  factor_cols <- prep$qualitative_cols
   
-  numeric_cols <- names(df)[sapply(df, is.numeric)]
-  
-  if(length(numeric_cols) == 0) {
-    warning("Brak kolumn numerycznych do tworzenia histogramów (log Y).")
-    return(NULL)
-  }
+  numeric_cols <- names(df_local)[sapply(df_local, is.numeric)]
+  if(length(numeric_cols) == 0) return(NULL)
   
   plots <- list()
-  
   for (f in factor_cols) {
     for (n in numeric_cols) {
-      p <- ggplot(df, aes_string(x = n, fill = f)) +
+      p <- ggplot(df_local, aes_string(x = n, fill = f)) +
         geom_histogram(bins = bins, color = "black", alpha = 0.7) +
         facet_wrap(as.formula(paste("~", f)), scales = "free") +
         scale_y_log10() +

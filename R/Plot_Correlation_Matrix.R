@@ -13,9 +13,6 @@
 #'
 #' @export
 plot_correlation_matrix <- function(df, method = "pearson", title = "Macierz korelacji") {
-  if (!requireNamespace("corrplot", quietly = TRUE)) {
-    stop("Pakiet 'corrplot' nie jest zainstalowany. Zainstaluj go komendą install.packages('corrplot').")
-  }
   
   df_num <- df[sapply(df, is.numeric)]
   if (ncol(df_num) < 2) {

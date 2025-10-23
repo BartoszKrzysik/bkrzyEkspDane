@@ -14,16 +14,12 @@
 #'
 #' @export
 plot_scatter_ellipse <- function(df, factor_cols = NULL) {
-  if (is.null(factor_cols) || length(factor_cols) == 0) {
-    df$All <- "All"
-    factor_cols <- "All"
-  }
+  prep <- prepare_qualitative(df, factor_cols)
+  df_local <- prep$df
+  factor_cols <- prep$qualitative_cols
   
-  numeric_cols <- names(df)[sapply(df, is.numeric)]
-  if(length(numeric_cols) < 2) {
-    warning("Brak co najmniej 2 kolumn numerycznych do tworzenia wykresów.")
-    return(NULL)
-  }
+  numeric_cols <- names(df_local)[sapply(df_local, is.numeric)]
+  if(length(numeric_cols) < 2) return(NULL)
   
   numeric_pairs <- combn(numeric_cols, 2, simplify = FALSE)
   plots <- list()
@@ -33,7 +29,7 @@ plot_scatter_ellipse <- function(df, factor_cols = NULL) {
       x_col <- pair[1]
       y_col <- pair[2]
       
-      p <- ggplot(df, aes_string(x = x_col, y = y_col, color = f)) +
+      p <- ggplot(df_local, aes_string(x = x_col, y = y_col, color = f)) +
         geom_point(alpha = 0.7) +
         stat_ellipse(level = 0.95) +
         theme_minimal(base_size = 15) +

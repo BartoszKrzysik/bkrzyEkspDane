@@ -15,23 +15,18 @@
 #'
 #' @export
 plot_qq_grid <- function(df, factor_cols = NULL, palette = "jco") {
-  if (is.null(factor_cols) || length(factor_cols) == 0) {
-    df$All <- "All"
-    factor_cols <- "All"
-  }
+  prep <- prepare_qualitative(df, factor_cols)
+  df_local <- prep$df
+  factor_cols <- prep$qualitative_cols
   
-  numeric_cols <- names(df)[sapply(df, is.numeric)]
-  
-  if(length(numeric_cols) == 0) {
-    warning("Brak kolumn numerycznych do tworzenia Q-Q plotów.")
-    return(NULL)
-  }
+  numeric_cols <- names(df_local)[sapply(df_local, is.numeric)]
+  if(length(numeric_cols) == 0) return(NULL)
   
   plots <- list()
   
   for (f in factor_cols) {
     for (n in numeric_cols) {
-      p <- ggpubr::ggqqplot(df, x = n, color = f, palette = palette) +
+      p <- ggpubr::ggqqplot(df_local, x = n, color = f, palette = palette) +
         xlab(n) +
         ylab("Theoretical Quantiles") +
         theme(legend.position = "none")

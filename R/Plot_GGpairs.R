@@ -20,27 +20,17 @@
 #'
 #' @export
 plot_ggpairs <- function(df, qualitative_cols = NULL) {
-  if (is.null(qualitative_cols) || length(qualitative_cols) == 0) {
-    df$All <- "All"
-    qualitative_cols <- "All"
-  }
+  prep <- prepare_qualitative(df, qualitative_cols)
+  df_local <- prep$df
+  qualitative_cols <- prep$qualitative_cols
   
-  num_cols <- names(df)[sapply(df, is.numeric)]
-  if (length(num_cols) < 2) {
-    stop("Potrzeba co najmniej dwóch kolumn numerycznych.")
-  }
+  num_cols <- names(df_local)[sapply(df_local, is.numeric)]
+  if (length(num_cols) < 2) stop("Potrzeba co najmniej dwóch kolumn numerycznych.")
   
   plots <- list()
-  
   for (col in qualitative_cols) {
-    if (!col %in% names(df)) next
-    
-    if (!is.factor(df[[col]])) {
-      df[[col]] <- as.factor(df[[col]])
-    }
-    
     p <- GGally::ggpairs(
-      df,
+      df_local,
       ggplot2::aes(color = .data[[col]]),
       columns = num_cols
     ) +

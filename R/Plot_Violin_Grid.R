@@ -15,18 +15,19 @@
 #'
 #' @export
 plot_violin_grid <- function(df, factor_cols = NULL) {
-  if (is.null(factor_cols) || length(factor_cols) == 0) {
-    df$All <- "All"
-    factor_cols <- "All"
-  }
   
-  numeric_cols <- names(df)[sapply(df, is.numeric)]
+  prep <- prepare_qualitative(df, factor_cols)
+  df_local <- prep$df
+  factor_cols <- prep$qualitative_cols
+  
+  numeric_cols <- names(df_local)[sapply(df_local, is.numeric)]
   if(length(numeric_cols) == 0) return(NULL)
   
   plots <- list()
+  
   for (f in factor_cols) {
     for (n in numeric_cols) {
-      p <- ggplot(df, aes_string(x = f, y = n, fill = f)) +
+      p <- ggplot(df_local, aes_string(x = f, y = n, fill = f)) +
         geom_violin(trim = FALSE, alpha = 0.7) +
         geom_boxplot(width = 0.1, fill = "white") +
         theme_minimal(base_size = 15) +

@@ -14,30 +14,24 @@
 #'
 #' @export
 plot_density_grid <- function(df, factor_cols = NULL) {
-  if (is.null(factor_cols) || length(factor_cols) == 0) {
-    df$All <- "All"
-    factor_cols <- "All"
-  }
+  prep <- prepare_qualitative(df, factor_cols)
+  df_local <- prep$df
+  factor_cols <- prep$qualitative_cols
   
-  numeric_cols <- names(df)[sapply(df, is.numeric)]
-  
-  if(length(numeric_cols) == 0) {
-    warning("Brak kolumn numerycznych do tworzenia wykresów density.")
-    return(NULL)
-  }
+  numeric_cols <- names(df_local)[sapply(df_local, is.numeric)]
+  if(length(numeric_cols) == 0) return(NULL)
   
   plots <- list()
-  
   for (f in factor_cols) {
     for (n in numeric_cols) {
-      p <- ggplot(df, aes_string(x = n, fill = f)) +
+      p <- ggplot(df_local, aes_string(x = n, fill = f)) +
         geom_density(alpha = 0.5) +
         theme_minimal(base_size = 15) +
         xlab(n) +
         ylab("Density") +
         theme(legend.position = "none")
       
-      plots <- c(plots, list(ggplotly(p) %>% layout(height = 400)))
+      plots <- c(plots, list(plotly::ggplotly(p) %>% plotly::layout(height = 400)))
     }
   }
   
@@ -52,5 +46,5 @@ plot_density_grid <- function(df, factor_cols = NULL) {
     ))))
   }
   
-  tagList(row_subplots)
+  htmltools::tagList(row_subplots)
 }

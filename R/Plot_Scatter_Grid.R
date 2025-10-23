@@ -14,21 +14,22 @@
 #'
 #' @export
 plot_scatter_grid <- function(df, factor_cols = NULL) {
-  if (is.null(factor_cols) || length(factor_cols) == 0) {
-    df$All <- "All"
-    factor_cols <- "All"
-  }
+  prep <- prepare_qualitative(df, factor_cols)
+  df_local <- prep$df
+  factor_cols <- prep$qualitative_cols
   
-  numeric_cols <- names(df)[sapply(df, is.numeric)]
+  numeric_cols <- names(df_local)[sapply(df_local, is.numeric)]
+  if(length(numeric_cols) < 2) return(NULL)
+  
   numeric_pairs <- combn(numeric_cols, 2, simplify = FALSE)
-  
   plots <- list()
+  
   for (f in factor_cols) {
     for (pair in numeric_pairs) {
       x_col <- pair[1]
       y_col <- pair[2]
       
-      p <- ggplot(df, aes_string(x = x_col, y = y_col, color = f)) +
+      p <- ggplot(df_local, aes_string(x = x_col, y = y_col, color = f)) +
         geom_point(alpha = 0.7) +
         theme_minimal(base_size = 15) +
         theme(legend.position = "none")
