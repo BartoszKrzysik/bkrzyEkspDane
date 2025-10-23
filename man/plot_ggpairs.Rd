@@ -2,25 +2,30 @@
 % Please edit documentation in R/Plot_GGpairs.R
 \name{plot_ggpairs}
 \alias{plot_ggpairs}
-\title{Tworzy macierz par (pairplot) dla kolumn numerycznych z rozróżnieniem według zmiennych jakościowych}
+\title{Tworzy interaktywne macierze par (ggpairs) dla kolumn numerycznych}
 \usage{
 plot_ggpairs(df, qualitative_cols = NULL)
 }
 \arguments{
 \item{df}{Ramka danych zawierająca kolumny numeryczne do wizualizacji.}
 
-\item{qualitative_cols}{Wektor nazw kolumn jakościowych (faktorowych) użytych do kolorowania wykresów.
-Domyślnie \code{NULL}, wtedy wszystkie dane traktowane są jako jedna grupa.}
+\item{qualitative_cols}{Wektor nazw kolumn jakościowych (faktorowych lub character),
+które mają być użyte do kolorowania punktów w wykresach. Domyślnie NULL — wszystkie dane
+traktowane są jako jedna grupa.}
 }
 \value{
-Obiekt klasy \code{tagList} zawierający wykresy \code{ggpairs}, gotowy do renderowania w HTML/RMarkdown.
+Obiekt klasy \code{tagList} zawierający wykresy \code{ggpairs} jako obiekty
+  interaktywne \pkg{plotly}, gotowe do wyrenderowania w HTML lub shiny.
 }
 \description{
-Funkcja generuje wykresy macierzy par (\code{GGally::ggpairs}) dla wszystkich kolumn numerycznych
-w ramce danych. Dla każdej kolumny jakościowej (\code{qualitative_cols}) tworzony jest osobny wykres,
-w którym kolor punktów odpowiada kategoriom danej zmiennej.
+Funkcja generuje wykresy macierzy par (\code{GGally::ggpairs}) dla wszystkich kolumn
+numerycznych w ramce danych. Dla każdej kolumny jakościowej (faktorowej lub character)
+tworzony jest osobny wykres, w którym kolor punktów odpowiada kategoriom danej zmiennej.
+Wykresy są konwertowane na obiekty interaktywne \code{plotly} i zwracane jako lista
+\code{tagList} gotowa do umieszczenia w RMarkdown lub shiny.
 }
 \examples{
-plot_ggpairs(mtcars, qualitative_cols = c("cyl", "gear"))
+library(MASS)
+plot_ggpairs(Cars93, qualitative_cols = c("Type", "Origin"))
 
 }

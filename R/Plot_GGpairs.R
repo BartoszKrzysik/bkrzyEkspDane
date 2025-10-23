@@ -1,17 +1,22 @@
-#' Tworzy macierz par (pairplot) dla kolumn numerycznych z rozróżnieniem według zmiennych jakościowych
+#' Tworzy interaktywne macierze par (ggpairs) dla kolumn numerycznych
 #'
-#' Funkcja generuje wykresy macierzy par (\code{GGally::ggpairs}) dla wszystkich kolumn numerycznych
-#' w ramce danych. Dla każdej kolumny jakościowej (\code{qualitative_cols}) tworzony jest osobny wykres,
-#' w którym kolor punktów odpowiada kategoriom danej zmiennej.
+#' Funkcja generuje wykresy macierzy par (\code{GGally::ggpairs}) dla wszystkich kolumn
+#' numerycznych w ramce danych. Dla każdej kolumny jakościowej (faktorowej lub character)
+#' tworzony jest osobny wykres, w którym kolor punktów odpowiada kategoriom danej zmiennej.
+#' Wykresy są konwertowane na obiekty interaktywne \code{plotly} i zwracane jako lista
+#' \code{tagList} gotowa do umieszczenia w RMarkdown lub shiny.
 #'
 #' @param df Ramka danych zawierająca kolumny numeryczne do wizualizacji.
-#' @param qualitative_cols Wektor nazw kolumn jakościowych (faktorowych) użytych do kolorowania wykresów.
-#'   Domyślnie \code{NULL}, wtedy wszystkie dane traktowane są jako jedna grupa.
+#' @param qualitative_cols Wektor nazw kolumn jakościowych (faktorowych lub character),
+#'   które mają być użyte do kolorowania punktów w wykresach. Domyślnie NULL — wszystkie dane
+#'   traktowane są jako jedna grupa.
 #'
-#' @return Obiekt klasy \code{tagList} zawierający wykresy \code{ggpairs}, gotowy do renderowania w HTML/RMarkdown.
+#' @return Obiekt klasy \code{tagList} zawierający wykresy \code{ggpairs} jako obiekty
+#'   interaktywne \pkg{plotly}, gotowe do wyrenderowania w HTML lub shiny.
 #'
 #' @examples
-#' plot_ggpairs(mtcars, qualitative_cols = c("cyl", "gear"))
+#' library(MASS)
+#' plot_ggpairs(Cars93, qualitative_cols = c("Type", "Origin"))
 #'
 #' @export
 plot_ggpairs <- function(df, qualitative_cols = NULL) {
@@ -42,7 +47,7 @@ plot_ggpairs <- function(df, qualitative_cols = NULL) {
       ggplot2::theme_minimal(base_size = 18) +
       ggplot2::ggtitle(paste("GGpairs – kolor wg:", col))
     
-    plots <- c(plots, list(p))
+    plots <- c(plots, list(plotly::ggplotly(p) %>% plotly::layout(height = 700)))
   }
   
   htmltools::tagList(plots)
