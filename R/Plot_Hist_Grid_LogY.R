@@ -30,25 +30,13 @@ plot_hist_grid_logY <- function(df, factor_cols = NULL, bins = 20) {
         geom_histogram(bins = bins, color = "black", alpha = 0.7) +
         facet_wrap(as.formula(paste("~", f)), scales = "free") +
         scale_y_log10() +
-        theme_minimal(base_size = 15) +
+        ggthemes::theme_clean(base_size = 15) +
         xlab(n) +
-        ylab("Count (log scale)") +
-        theme(legend.position = "none")
+        ylab("Count (log scale)")
       
-      plots <- c(plots, list(ggplotly(p) %>% layout(height = 400)))
+      plots <- c(plots, list(ggplotly(p)))
     }
   }
   
-  ncol_plot <- 2
-  row_subplots <- list()
-  for (i in seq(1, length(plots), by = ncol_plot)) {
-    end_i <- min(i + ncol_plot - 1, length(plots))
-    row_plots <- plots[i:end_i]
-    row_subplots <- c(row_subplots, list(do.call(plotly::subplot, c(
-      row_plots,
-      list(nrows = 1, shareX = FALSE, shareY = FALSE, margin = 0.05)
-    ))))
-  }
-  
-  tagList(row_subplots)
+  return(plots)
 }

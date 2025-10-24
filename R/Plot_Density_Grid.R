@@ -8,7 +8,7 @@
 #' @param df Ramka danych zawierająca kolumny numeryczne do wizualizacji.
 #' @param factor_cols Wektor nazw kolumn jakościowych (faktorowych) do kolorowania
 #'   wykresów (domyślnie NULL — wszystkie dane traktowane jako jedna grupa).
-#' @return Obiekt klasy \code{tagList} z listą subplotów \pkg{plotly}.
+#' @return Obiekt klasy \code{list} z listą subplotów \pkg{plotly}.
 #' @examples
 #' plot_density_grid(mtcars, factor_cols = c("cyl"))
 #'
@@ -26,25 +26,12 @@ plot_density_grid <- function(df, factor_cols = NULL) {
     for (n in numeric_cols) {
       p <- ggplot(df_local, aes_string(x = n, fill = f)) +
         geom_density(alpha = 0.5) +
-        theme_minimal(base_size = 15) +
+        ggthemes::theme_clean(base_size = 15) +
         xlab(n) +
-        ylab("Density") +
-        theme(legend.position = "none")
+        ylab("Density")
       
-      plots <- c(plots, list(plotly::ggplotly(p) %>% plotly::layout(height = 400)))
+      plots <- c(plots, list(ggplotly(p)))
     }
   }
-  
-  ncol_plot <- 2
-  row_subplots <- list()
-  for (i in seq(1, length(plots), by = ncol_plot)) {
-    end_i <- min(i + ncol_plot - 1, length(plots))
-    row_plots <- plots[i:end_i]
-    row_subplots <- c(row_subplots, list(do.call(plotly::subplot, c(
-      row_plots,
-      list(nrows = 1, shareX = FALSE, shareY = FALSE, margin = 0.05)
-    ))))
-  }
-  
-  htmltools::tagList(row_subplots)
+  return(plots)
 }

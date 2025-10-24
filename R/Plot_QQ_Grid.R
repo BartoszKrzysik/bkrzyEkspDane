@@ -29,22 +29,11 @@ plot_qq_grid <- function(df, factor_cols = NULL, palette = "jco") {
       p <- ggpubr::ggqqplot(df_local, x = n, color = f, palette = palette) +
         xlab(n) +
         ylab("Theoretical Quantiles") +
-        theme(legend.position = "none")
+        ggthemes::theme_clean(base_size = 15)
       
-      plots <- c(plots, list(plotly::ggplotly(p) %>% layout(height = 400)))
+      plots <- c(plots, list(ggplotly(p)))
     }
   }
   
-  ncol_plot <- 2
-  row_subplots <- list()
-  for (i in seq(1, length(plots), by = ncol_plot)) {
-    end_i <- min(i + ncol_plot - 1, length(plots))
-    row_plots <- plots[i:end_i]
-    row_subplots <- c(row_subplots, list(do.call(plotly::subplot, c(
-      row_plots,
-      list(nrows = 1, shareX = FALSE, shareY = FALSE, margin = 0.05)
-    ))))
-  }
-  
-  tagList(row_subplots)
+  return(plots)
 }

@@ -34,11 +34,12 @@ plot_ggpairs <- function(df, qualitative_cols = NULL) {
       ggplot2::aes(color = .data[[col]]),
       columns = num_cols
     ) +
-      ggplot2::theme_minimal(base_size = 18) +
-      ggplot2::ggtitle(paste("GGpairs – kolor wg:", col))
+      ggthemes::theme_clean(base_size = 18) +
+      ggplot2::ggtitle(paste("GGpairs – kolor wg:", col))+
+      ggplot2::theme(aspect.ratio = 1)
     
-    plots <- c(plots, list(plotly::ggplotly(p) %>% plotly::layout(height = 700)))
+    plots <- c(plots, list(ggplotly(p)))
   }
   
-  htmltools::tagList(plots)
+  return(plots)
 }

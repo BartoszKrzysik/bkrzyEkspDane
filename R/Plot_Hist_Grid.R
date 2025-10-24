@@ -9,7 +9,7 @@
 #' @param factor_cols Wektor nazw kolumn jakościowych (faktorowych) do kolorowania
 #'   i facetingu histogramów (domyślnie NULL — wszystkie dane traktowane jako jedna grupa).
 #' @param bins Liczba koszyków (bins) w histogramach (domyślnie 20).
-#' @return Obiekt klasy \code{tagList} z listą subplotów \pkg{plotly}.
+#' @return Obiekt klasy \code{list} z listą subplotów \pkg{plotly}.
 #' @examples
 #' plot_hist_grid(mtcars, factor_cols = c("cyl"), bins = 15)
 #'
@@ -28,25 +28,13 @@ plot_hist_grid <- function(df, factor_cols = NULL, bins = 20) {
       p <- ggplot(df_local, aes_string(x = n, fill = f)) +
         geom_histogram(bins = bins, color = "black", alpha = 0.7) +
         facet_wrap(as.formula(paste("~", f)), scales = "free") +
-        theme_minimal(base_size = 15) +
+        ggthemes::theme_clean(base_size = 15) +
         xlab(n) +
-        ylab("Count") +
-        theme(legend.position = "none")
+        ylab("Count")
       
-      plots <- c(plots, list(ggplotly(p) %>% layout(height = 400)))
+      plots <- c(plots, list(ggplotly(p)))
     }
   }
   
-  ncol_plot <- 2
-  row_subplots <- list()
-  for (i in seq(1, length(plots), by = ncol_plot)) {
-    end_i <- min(i + ncol_plot - 1, length(plots))
-    row_plots <- plots[i:end_i]
-    row_subplots <- c(row_subplots, list(do.call(plotly::subplot, c(
-      row_plots,
-      list(nrows = 1, shareX = FALSE, shareY = FALSE, margin = 0.05)
-    ))))
-  }
-  
-  tagList(row_subplots)
+  return(plots)
 }

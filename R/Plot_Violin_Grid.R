@@ -30,27 +30,13 @@ plot_violin_grid <- function(df, factor_cols = NULL) {
       p <- ggplot(df_local, aes_string(x = f, y = n, fill = f)) +
         geom_violin(trim = FALSE, alpha = 0.7) +
         geom_boxplot(width = 0.1, fill = "white") +
-        theme_minimal(base_size = 15) +
+        ggthemes::theme_clean(base_size = 15) +
         xlab(f) +
-        ylab(n) +
-        theme(legend.position = "none")
+        ylab(n) 
       
-      plots <- c(plots, list(ggplotly(p) %>% layout(height = 400)))
+      plots <- c(plots, list(ggplotly(p)))
     }
   }
   
-  ncol_plot <- 2
-  row_subplots <- list()
-  
-  for (i in seq(1, length(plots), by = ncol_plot)) {
-    end_i <- min(i + ncol_plot - 1, length(plots))
-    row_plots <- plots[i:end_i]
-    row_subplots <- c(row_subplots, list(do.call(subplot, c(row_plots, 
-                                                            list(nrows = 1, 
-                                                                 shareX = FALSE, 
-                                                                 shareY = FALSE, 
-                                                                 margin = 0.05)))))
-  }
-  
-  tagList(row_subplots)
+  return(plots)
 }

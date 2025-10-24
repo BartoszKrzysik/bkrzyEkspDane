@@ -12,27 +12,23 @@
 #' plot_correlation_matrix(mtcars, method = "pearson", title = "Korelacje mtcars")
 #'
 #' @export
-plot_correlation_matrix <- function(df, method = "pearson", title = "Macierz korelacji") {
-  
+plot_correlation_matrix<- function(df, method = "pearson", title = "Correlation Matrix") {
   df_num <- df[sapply(df, is.numeric)]
-  if (ncol(df_num) < 2) {
-    stop("Dane muszą zawierać co najmniej dwie kolumny numeryczne.")
-  }
+  if (ncol(df_num) < 2) stop("Dane muszą mieć co najmniej 2 kolumny numeryczne.")
   
   M <- cor(df_num, method = method, use = "complete.obs")
   
-  cols <- colorRampPalette(c("#619CFF", "#00BA38", "#F8766D"))(200)
-  
-  corrplot::corrplot(
-    M,
-    method = "color",
-    type = "upper",
-    tl.col = "black",
-    addCoef.col = "black",
-    number.cex = 0.8,
-    col = rev(cols),
-    tl.srt = 45,
-    title = title,
-    mar = c(0, 0, 2, 0)
+  df_long <- data.frame(
+    Var1 = rep(rownames(M), times = ncol(M)),
+    Var2 = rep(colnames(M), each = nrow(M)),
+    Correlation = as.vector(M)
   )
+  ggplot(df_long, aes(x = Var1, y = Var2, fill = Correlation)) +
+    geom_tile(color = "white") +
+    scale_fill_gradient2(low = "#619CFF", mid = "white", high = "#F8766D", midpoint = 0) +
+    geom_text(aes(label = round(Correlation, 2)), size = 4) +
+    theme_clean(base_size = 15) +
+    labs(title = title, x = NULL, y = NULL) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
 }
+

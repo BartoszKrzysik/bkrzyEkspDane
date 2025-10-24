@@ -2,38 +2,47 @@
 % Please edit documentation in R/Data_Visualization.R
 \name{data_visualization}
 \alias{data_visualization}
-\title{Tworzy raport HTML z wizualizacjami danych}
+\title{Tworzy raport HTML w formie flexdashboard z wizualizacjami danych}
 \usage{
 data_visualization(
   data,
   qualitative_cols = NULL,
   file = "plots.html",
-  open = FALSE,
-  css_file = "data_visualization.css"
+  author = NULL,
+  location = NULL,
+  title = "Data Visualization",
+  open = FALSE
 )
 }
 \arguments{
 \item{data}{Ramka danych do wizualizacji.}
 
-\item{qualitative_cols}{Wektor nazw kolumn jakościowych (faktorowych lub character),
-które mają być wyróżnione kolorami w wykresach (domyślnie NULL).}
+\item{qualitative_cols}{Wektor nazw kolumn jakościowych, które mają być wyróżnione kolorami (domyślnie NULL).}
 
 \item{file}{Nazwa pliku wyjściowego HTML (domyślnie "plots.html").}
 
-\item{open}{Czy otworzyć raport w przeglądarce po wygenerowaniu (domyślnie FALSE).}
+\item{author}{Autor raportu (domyślnie NULL).}
 
-\item{css_file}{Nazwa pliku CSS używanego w raporcie (domyślnie "data_visualization.css").}
+\item{location}{Lokalizacja raportu (domyślnie NULL).}
+
+\item{title}{Tytuł raportu (domyślnie "Data Visualization").}
+
+\item{open}{Czy otworzyć raport w przeglądarce po wygenerowaniu (domyślnie FALSE).}
 }
 \value{
 NULL. Funkcja zapisuje raport do pliku HTML i opcjonalnie otwiera go w przeglądarce.
 }
 \description{
-Funkcja generuje automatyczny raport HTML z wizualizacjami danych,
-obejmujący m.in. wykresy typu GGally ggpairs, scatter, histogram,
-density, violin, QQ oraz macierze korelacji. Dodatkowo wspiera
-wyróżnianie kolumn jakościowych (faktorowych) poprzez kolorowanie.
+Funkcja generuje automatyczny raport HTML w formie dashboardu, zawierający:
+- macierze par (ggpairs),
+- wykresy typu scatter, scatter z elipsą, histogram, density, violin, QQ,
+- macierze korelacji (Pearson, Spearman, Kendall),
+- informacje o sesji.
+}
+\details{
+Wspiera wyróżnianie kolumn jakościowych (faktorowych lub character) poprzez kolorowanie.
 }
 \examples{
-data_visualization(mtcars, qualitative_cols = c("cyl", "gear"), file = "mtcars_plots.html")
+data_visualization(iris, qualitative_cols = "Species", author = "John Doe", location = "Kraków", open = TRUE)
 
 }

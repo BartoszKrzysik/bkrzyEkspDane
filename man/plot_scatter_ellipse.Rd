@@ -13,7 +13,7 @@ plot_scatter_ellipse(df, factor_cols = NULL)
 punktów i elips (domyślnie NULL — wszystkie dane traktowane jako jedna grupa).}
 }
 \value{
-Obiekt klasy \code{tagList} z listą subplotów \pkg{plotly}.
+Obiekt klasy \code{list} z listą subplotów \pkg{plotly}.
 }
 \description{
 Funkcja generuje interaktywne wykresy punktowe (scatter) dla wszystkich par kolumn

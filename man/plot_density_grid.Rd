@@ -13,7 +13,7 @@ plot_density_grid(df, factor_cols = NULL)
 wykresów (domyślnie NULL — wszystkie dane traktowane jako jedna grupa).}
 }
 \value{
-Obiekt klasy \code{tagList} z listą subplotów \pkg{plotly}.
+Obiekt klasy \code{list} z listą subplotów \pkg{plotly}.
 }
 \description{
 Funkcja generuje interaktywne wykresy gęstości dla wszystkich kolumn numerycznych

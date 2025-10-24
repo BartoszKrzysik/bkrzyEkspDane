@@ -4,7 +4,7 @@
 \alias{plot_correlation_matrix}
 \title{Rysuje macierz korelacji dla kolumn numerycznych}
 \usage{
-plot_correlation_matrix(df, method = "pearson", title = "Macierz korelacji")
+plot_correlation_matrix(df, method = "pearson", title = "Correlation Matrix")
 }
 \arguments{
 \item{df}{Ramka danych zawierająca kolumny numeryczne do analizy korelacji.}

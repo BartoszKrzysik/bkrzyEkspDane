@@ -2,35 +2,69 @@
 % Please edit documentation in R/Data_Raport.R
 \name{data_report}
 \alias{data_report}
-\title{Generuje raport HTML z eksploracji danych}
+\title{Generuje raport danych w formacie HTML}
 \usage{
 data_report(
   df,
   file = "data_report.html",
   title = "Raport danych",
+  author = NULL,
+  location = NULL,
   open = FALSE
 )
 }
 \arguments{
-\item{df}{Ramka danych do analizy.}
+\item{df}{Ramka danych (`data.frame` lub tibble), dla której ma zostać wygenerowany raport.}
 
 \item{file}{Nazwa pliku wyjściowego HTML (domyślnie "data_report.html").}
 
 \item{title}{Tytuł raportu (domyślnie "Raport danych").}
 
-\item{open}{Czy otworzyć raport w przeglądarce po wygenerowaniu (domyślnie FALSE).}
+\item{author}{(Opcjonalnie) Imię i nazwisko autora raportu.}
+
+\item{location}{(Opcjonalnie) Miejscowość lub lokalizacja, która ma się pojawić w raporcie.}
+
+\item{open}{Logiczna wartość: jeśli TRUE, raport zostanie automatycznie otwarty w przeglądarce po wygenerowaniu (domyślnie FALSE).}
 }
 \value{
-NULL. Funkcja zapisuje raport do pliku i opcjonalnie otwiera go w przeglądarce.
+Zapisuje plik HTML w bieżącym katalogu roboczym i zwraca ścieżkę do pliku.
+  Jeśli `open = TRUE`, plik zostanie również otwarty w domyślnej przeglądarce.
 }
 \description{
-Funkcja tworzy automatyczny raport HTML z podstawową analizą ramki danych.
-Raport zawiera m.in. wymiary danych, strukturę, brakujące wartości, liczbę zer,
-typy zmiennych, liczbę unikalnych wartości, najczęstsze i najrzadsze wartości,
-podstawowe statystyki kolumn numerycznych, korelacje oraz liczbę kategorii
-w kolumnach faktorowych i znakowych.
+Funkcja tworzy raport z wybranej ramki danych (`data.frame`) w formacie HTML.
+Raport zawiera m.in.:
+\itemize{
+  \item wymiary danych,
+  \item nazwy i typy kolumn,
+  \item brakujące wartości (NA) i liczby zer w kolumnach numerycznych,
+  \item statystyki opisowe kolumn numerycznych,
+  \item najczęstsze i najrzadsze wartości w kolumnach tekstowych lub faktorowych,
+  \item korelacje między kolumnami numerycznymi,
+  \item sessionInfo(),
+  \item dodatkowe informacje o autorze i miejscowości (opcjonalnie).
+}
+}
+\details{
+Funkcja automatycznie konwertuje tibbles lub inne obiekty dziedziczące po `data.frame`
+  na klasyczny `data.frame`, aby zapewnić pełną kompatybilność z pakietem `reactable`.
+
+  Raport generowany jest za pomocą `rmarkdown` i pakietu `reactable`, co umożliwia
+  interaktywną prezentację tabel (sortowanie, filtrowanie).
 }
 \examples{
-data_report(mtcars, file = "mtcars_report.html", title = "Raport mtcars")
+\dontrun{
+library(nycflights13)
+# Raport podstawowy
+data_report(flights)
+
+# Raport z autorem i miejscowością, otwarty w przeglądarce
+data_report(
+  flights,
+  title = "Raport o danych lotniczych",
+  author = "John Doe",
+  location = "Kraków",
+  open = TRUE
+)
+}
 
 }

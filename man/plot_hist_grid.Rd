@@ -15,7 +15,7 @@ i facetingu histogramów (domyślnie NULL — wszystkie dane traktowane jako jed
 \item{bins}{Liczba koszyków (bins) w histogramach (domyślnie 20).}
 }
 \value{
-Obiekt klasy \code{tagList} z listą subplotów \pkg{plotly}.
+Obiekt klasy \code{list} z listą subplotów \pkg{plotly}.
 }
 \description{
 Funkcja generuje interaktywne histogramy dla wszystkich kolumn numerycznych

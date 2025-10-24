@@ -8,7 +8,7 @@
 #' @param df Ramka danych zawierająca kolumny numeryczne do wizualizacji.
 #' @param factor_cols Wektor nazw kolumn jakościowych (faktorowych) do kolorowania
 #'   punktów i elips (domyślnie NULL — wszystkie dane traktowane jako jedna grupa).
-#' @return Obiekt klasy \code{tagList} z listą subplotów \pkg{plotly}.
+#' @return Obiekt klasy \code{list} z listą subplotów \pkg{plotly}.
 #' @examples
 #' plot_scatter_ellipse(mtcars, factor_cols = c("cyl"))
 #'
@@ -32,27 +32,12 @@ plot_scatter_ellipse <- function(df, factor_cols = NULL) {
       p <- ggplot(df_local, aes_string(x = x_col, y = y_col, color = f)) +
         geom_point(alpha = 0.7) +
         stat_ellipse(level = 0.95) +
-        theme_minimal(base_size = 15) +
-        theme(legend.position = "none")
+        ggthemes::theme_clean(base_size = 15) +
+        labs(x = x_col, y = y_col, color = f)
       
-      plots <- c(plots, list(ggplotly(p) %>% layout(
-        height = 400,
-        xaxis = list(title = x_col),
-        yaxis = list(title = y_col)
-      )))
+      plots <- c(plots, list(ggplotly(p)))
     }
   }
   
-  ncol_plot <- 2
-  row_subplots <- list()
-  for (i in seq(1, length(plots), by = ncol_plot)) {
-    end_i <- min(i + ncol_plot - 1, length(plots))
-    row_plots <- plots[i:end_i]
-    row_subplots <- c(row_subplots, list(do.call(subplot, c(
-      row_plots,
-      list(nrows = 1, shareX = FALSE, shareY = FALSE, margin = 0.05)
-    ))))
-  }
-  
-  tagList(row_subplots)
+  return(plots)
 }
