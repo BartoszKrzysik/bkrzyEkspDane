@@ -18,7 +18,6 @@
 #' library(MASS)
 #' plot_ggpairs(Cars93, qualitative_cols = c("Type", "Origin"))
 #'
-#' @export
 plot_ggpairs <- function(df, qualitative_cols = NULL) {
   prep <- prepare_qualitative(df, qualitative_cols)
   df_local <- prep$df

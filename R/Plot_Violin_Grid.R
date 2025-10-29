@@ -13,7 +13,6 @@
 #' @examples
 #' plot_violin_grid(mtcars, factor_cols = c("cyl"))
 #'
-#' @export
 plot_violin_grid <- function(df, factor_cols = NULL) {
   
   prep <- prepare_qualitative(df, factor_cols)

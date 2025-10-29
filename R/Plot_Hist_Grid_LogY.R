@@ -9,13 +9,11 @@
 #' @param df Ramka danych zawierająca kolumny numeryczne do wizualizacji.
 #' @param factor_cols Wektor nazw kolumn jakościowych (faktorowych) do kolorowania
 #'   i facetingu histogramów (domyślnie NULL — wszystkie dane traktowane jako jedna grupa).
-#' @param bins Liczba koszyków (bins) w histogramach (domyślnie 20).
 #' @return Obiekt klasy \code{tagList} z listą subplotów \pkg{plotly}.
 #' @examples
-#' plot_hist_grid_logY(mtcars, factor_cols = c("cyl"), bins = 15)
+#' plot_hist_grid_logY(mtcars, factor_cols = c("cyl"))
 #'
-#' @export
-plot_hist_grid_logY <- function(df, factor_cols = NULL, bins = 20) {
+plot_hist_grid_logY <- function(df, factor_cols = NULL) {
   prep <- prepare_qualitative(df, factor_cols)
   df_local <- prep$df
   factor_cols <- prep$qualitative_cols
@@ -27,7 +25,7 @@ plot_hist_grid_logY <- function(df, factor_cols = NULL, bins = 20) {
   for (f in factor_cols) {
     for (n in numeric_cols) {
       p <- ggplot(df_local, aes_string(x = n, fill = f)) +
-        geom_histogram(bins = bins, color = "black", alpha = 0.7) +
+        geom_histogram(color = "black", alpha = 0.7) +
         facet_wrap(as.formula(paste("~", f)), scales = "free") +
         scale_y_log10() +
         ggthemes::theme_clean(base_size = 15) +

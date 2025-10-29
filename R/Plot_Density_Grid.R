@@ -12,7 +12,6 @@
 #' @examples
 #' plot_density_grid(mtcars, factor_cols = c("cyl"))
 #'
-#' @export
 plot_density_grid <- function(df, factor_cols = NULL) {
   prep <- prepare_qualitative(df, factor_cols)
   df_local <- prep$df

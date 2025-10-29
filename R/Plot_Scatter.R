@@ -1,17 +1,18 @@
-#' Tworzy interaktywny wykres punktowy z elipsą dla jednej pary kolumn numerycznych
+#' Tworzy interaktywny wykres punktowy (scatter) dla jednej pary kolumn numerycznych
 #'
 #' Funkcja generuje wykres punktowy (scatter) dla jednej pary kolumn numerycznych.
-#' Dodatkowo rysowana jest elipsa obejmująca 95% punktów dla każdej grupy faktorowej.
+#' Możliwe jest rozdzielenie według jednej kolumny jakościowej (faktorowej), która
+#' jest używana do kolorowania punktów.
 #'
 #' @param df Ramka danych zawierająca kolumny numeryczne do wizualizacji.
 #' @param x_col Nazwa kolumny numerycznej dla osi X.
 #' @param y_col Nazwa kolumny numerycznej dla osi Y.
-#' @param factor_col Nazwa kolumny jakościowej (faktorowej) do kolorowania punktów i elips (domyślnie NULL).
-#' @return Obiekt \pkg{plotly} z wykresem punktowym i elipsą.
+#' @param factor_col Nazwa kolumny jakościowej (faktorowej) do kolorowania punktów (domyślnie NULL).
+#' @return Obiekt \pkg{plotly} z wykresem punktowym.
 #' @examples
-#' plot_scatter_ellipse(mtcars, x_col = "mpg", y_col = "disp", factor_col = "cyl")
+#' plot_scatter(mtcars, x_col = "mpg", y_col = "disp", factor_col = "cyl")
 #' @export
-plot_scatter_ellipse <- function(df, x_col, y_col, factor_col = NULL) {
+plot_scatter <- function(df, x_col, y_col, factor_col = NULL) {
   
   if (!x_col %in% names(df)) stop("Kolumna ", x_col, " nie istnieje w df")
   if (!y_col %in% names(df)) stop("Kolumna ", y_col, " nie istnieje w df")
@@ -24,7 +25,6 @@ plot_scatter_ellipse <- function(df, x_col, y_col, factor_col = NULL) {
   
   p <- ggplot(df, aes_string(x = x_col, y = y_col, color = factor_col)) +
     geom_point(alpha = 0.7) +
-    stat_ellipse(level = 0.95) +
     ggthemes::theme_clean(base_size = 15) +
     labs(x = x_col, y = y_col, color = factor_col)
   

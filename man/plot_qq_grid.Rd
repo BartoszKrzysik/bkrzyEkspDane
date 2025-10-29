@@ -4,15 +4,13 @@
 \alias{plot_qq_grid}
 \title{Tworzy siatkę wykresów Q-Q dla kolumn numerycznych}
 \usage{
-plot_qq_grid(df, factor_cols = NULL, palette = "jco")
+plot_qq_grid(df, factor_cols = NULL)
 }
 \arguments{
 \item{df}{Ramka danych zawierająca kolumny numeryczne do wizualizacji.}
 
 \item{factor_cols}{Wektor nazw kolumn jakościowych (faktorowych) do kolorowania
 wykresów (domyślnie NULL — wszystkie dane traktowane jako jedna grupa).}
-
-\item{palette}{Paleta kolorów dla grup faktorowych (domyślnie "jco").}
 }
 \value{
 Obiekt klasy \code{tagList} z listą subplotów \pkg{plotly}.
@@ -24,6 +22,6 @@ które są używane do kolorowania. Wykresy są zwracane jako lista subplotów
 dla łatwego umieszczenia w RMarkdown.
 }
 \examples{
-plot_qq_grid(mtcars, factor_cols = c("cyl"), palette = "jco")
+plot_qq_grid(mtcars, factor_cols = c("cyl"))
 
 }

@@ -1,8 +1,7 @@
 #' Tworzy raport HTML w formie flexdashboard z wizualizacjami danych
 #'
 #' Funkcja generuje automatyczny raport HTML w formie dashboardu, zawierający:
-#' - macierze par (ggpairs),
-#' - wykresy typu scatter, scatter z elipsą, histogram, density, violin, QQ,
+#' - wykresy typu histogram, density, violin, QQ,
 #' - macierze korelacji (Pearson, Spearman, Kendall),
 #' - informacje o sesji.
 #' 
@@ -10,6 +9,8 @@
 #'
 #' @param data Ramka danych do wizualizacji.
 #' @param qualitative_cols Wektor nazw kolumn jakościowych, które mają być wyróżnione kolorami (domyślnie NULL).
+#' @param index Nazwa kolumny, która będzie używana jako oś X (np. czas). Jeśli NULL,
+#'   funkcja użyje kolejnych numerów wierszy.
 #' @param file Nazwa pliku wyjściowego HTML (domyślnie "plots.html").
 #' @param author Autor raportu (domyślnie NULL).
 #' @param location Lokalizacja raportu (domyślnie NULL).
@@ -19,11 +20,12 @@
 #' @return NULL. Funkcja zapisuje raport do pliku HTML i opcjonalnie otwiera go w przeglądarce.
 #'
 #' @examples
-#' data_visualization(iris, qualitative_cols = "Species", author = "John Doe", location = "Kraków", open = TRUE)
+#' data_visualization_simple(iris, qualitative_cols = "Species", author = "John Doe", location = "Kraków", open = TRUE)
 #'
 #' @export
-data_visualization <- function(data, 
-                               qualitative_cols = NULL, 
+data_visualization_simple <- function(data, 
+                               qualitative_cols = NULL,
+                               index = NULL,
                                file = "plots.html",
                                author = NULL,
                                location = NULL,
@@ -73,35 +75,6 @@ rmd_body <- c(
   if(!is.null(qualitative_cols)) paste0("factor_cols <- c(", paste0('"', qualitative_cols, '"', collapse = ", "), ")") else "factor_cols <- NULL",
   "```",
   "",
-  "# GGpairs Plots {.column}",
-  "",
-  "## GGpairs Plots",
-  "```{r ggpairs_plots, echo=FALSE, warning=FALSE, message=FALSE}",
-  "plots_list <- plot_ggpairs(df, qualitative_cols = factor_cols)",
-  "htmltools::tagList(plots_list)",
-  "```",
-  "Raport wygenerowany przez pakiet [bkrzyEkspDane](https://github.com/BartoszKrzysik/bkrzyEkspDane.git) na licencji MIT.\n",
-  "Korzysta z pakietów open-source: ggthemes, ggplot2, plotly, ggpubr, dplyr, GGally, reactable, rmarkdown, flexdashboard.\n",
-  "",
-  "# Scatter Ellipse Plots {.column}",
-  "",
-  "## Scatter Ellipse Plots",
-  "```{r scatter_ellipse_plots, echo=FALSE, warning=FALSE, message=FALSE, fig.width=12, fig.height=8}",
-  "plots_list <- plot_scatter_ellipse_grid(df, factor_cols = factor_cols)",
-  "htmltools::tagList(plots_list)",
-  "```",
-  "Raport wygenerowany przez pakiet [bkrzyEkspDane](https://github.com/BartoszKrzysik/bkrzyEkspDane.git) na licencji MIT.\n",
-  "Korzysta z pakietów open-source: ggthemes, ggplot2, plotly, ggpubr, dplyr, GGally, reactable, rmarkdown, flexdashboard.\n",
-  "",
-  "# Scatter Plots {.column}",
-  "",
-  "## Scatter Plots",
-  "```{r scatter_plots, echo=FALSE, warning=FALSE, message=FALSE, fig.width=12, fig.height=8}",
-  "plots_list <- plot_scatter_grid(df, factor_cols = factor_cols)",
-  "htmltools::tagList(plots_list)",
-  "```",
-  "Raport wygenerowany przez pakiet [bkrzyEkspDane](https://github.com/BartoszKrzysik/bkrzyEkspDane.git) na licencji MIT.\n",
-  "Korzysta z pakietów open-source: ggthemes, ggplot2, plotly, ggpubr, dplyr, GGally, reactable, rmarkdown, flexdashboard.\n",
   "# Line plot {.column}",
   "",
   "## Line plot",
@@ -180,26 +153,6 @@ rmd_body <- c(
   "plots_list <- plot_qq_grid(df, factor_cols = factor_cols)",
   "htmltools::tagList(plots_list)",
   "```",
-  "Raport wygenerowany przez pakiet [bkrzyEkspDane](https://github.com/BartoszKrzysik/bkrzyEkspDane.git) na licencji MIT.\n",
-  "Korzysta z pakietów open-source: ggthemes, ggplot2, plotly, ggpubr, dplyr, GGally, reactable, rmarkdown, flexdashboard.\n",
-  "",
-  "# Correlation plots",
-  "",
-  "### Pearson corplot",
-  "```{r correlation_pearson,dev='png', echo=FALSE, warning=FALSE, message=FALSE,fig.width=8, fig.height=8}\n",
-  "plot_correlation_matrix(df, 'pearson', 'Pearson Correlation')\n",
-  "```\n",
-  "",
-  "### Spearman corplot",
-  "```{r correlation_spearman,dev='png', echo=FALSE, warning=FALSE, message=FALSE, fig.width=8, fig.height=8}\n",
-  "plot_correlation_matrix(df, 'spearman', 'Spearman Correlation')\n",
-  "```\n",
-  "",
-  "### Kendall corplot",
-  "```{r correlation_kendall,dev='png', echo=FALSE, warning=FALSE, message=FALSE, fig.width=8, fig.height=8}\n",
-  "plot_correlation_matrix(df, 'kendall', 'Kendall Correlation')\n",
-  "```\n",
-  "### Footer",
   "Raport wygenerowany przez pakiet [bkrzyEkspDane](https://github.com/BartoszKrzysik/bkrzyEkspDane.git) na licencji MIT.\n",
   "Korzysta z pakietów open-source: ggthemes, ggplot2, plotly, ggpubr, dplyr, GGally, reactable, rmarkdown, flexdashboard.\n",
   "",

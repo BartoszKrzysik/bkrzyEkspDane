@@ -4,15 +4,13 @@
 \alias{plot_hist_grid}
 \title{Tworzy siatkę histogramów dla kolumn numerycznych}
 \usage{
-plot_hist_grid(df, factor_cols = NULL, bins = 20)
+plot_hist_grid(df, factor_cols = NULL)
 }
 \arguments{
 \item{df}{Ramka danych zawierająca kolumny numeryczne do wizualizacji.}
 
 \item{factor_cols}{Wektor nazw kolumn jakościowych (faktorowych) do kolorowania
 i facetingu histogramów (domyślnie NULL — wszystkie dane traktowane jako jedna grupa).}
-
-\item{bins}{Liczba koszyków (bins) w histogramach (domyślnie 20).}
 }
 \value{
 Obiekt klasy \code{list} z listą subplotów \pkg{plotly}.
@@ -24,6 +22,6 @@ które są używane do wypełnienia kolorów i facetingu. Histogramy są zwracan
 jako lista subplotów dla łatwego umieszczenia w RMarkdown.
 }
 \examples{
-plot_hist_grid(mtcars, factor_cols = c("cyl"), bins = 15)
+plot_hist_grid(mtcars, factor_cols = c("cyl"))
 
 }

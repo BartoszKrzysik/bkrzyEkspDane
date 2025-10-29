@@ -8,13 +8,11 @@
 #' @param df Ramka danych zawierająca kolumny numeryczne do wizualizacji.
 #' @param factor_cols Wektor nazw kolumn jakościowych (faktorowych) do kolorowania
 #'   wykresów (domyślnie NULL — wszystkie dane traktowane jako jedna grupa).
-#' @param palette Paleta kolorów dla grup faktorowych (domyślnie "jco").
 #' @return Obiekt klasy \code{tagList} z listą subplotów \pkg{plotly}.
 #' @examples
-#' plot_qq_grid(mtcars, factor_cols = c("cyl"), palette = "jco")
+#' plot_qq_grid(mtcars, factor_cols = c("cyl"))
 #'
-#' @export
-plot_qq_grid <- function(df, factor_cols = NULL, palette = "jco") {
+plot_qq_grid <- function(df, factor_cols = NULL) {
   prep <- prepare_qualitative(df, factor_cols)
   df_local <- prep$df
   factor_cols <- prep$qualitative_cols
@@ -26,7 +24,7 @@ plot_qq_grid <- function(df, factor_cols = NULL, palette = "jco") {
   
   for (f in factor_cols) {
     for (n in numeric_cols) {
-      p <- ggpubr::ggqqplot(df_local, x = n, color = f, palette = palette) +
+      p <- ggpubr::ggqqplot(df_local, x = n, color = f) +
         xlab(n) +
         ylab("Theoretical Quantiles") +
         ggthemes::theme_clean(base_size = 15)

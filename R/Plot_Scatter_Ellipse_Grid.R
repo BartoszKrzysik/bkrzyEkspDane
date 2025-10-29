@@ -1,18 +1,18 @@
-#' Tworzy siatkę wykresów punktowych (scatter) dla par kolumn numerycznych
+#' Tworzy siatkę wykresów punktowych z elipsami dla par kolumn numerycznych
 #'
-#' Funkcja generuje interaktywne wykresy punktowe dla wszystkich par kolumn
-#' numerycznych w ramce danych. Możliwe jest rozdzielenie według kolumn jakościowych
-#' (faktorowych), które są używane do kolorowania punktów. Wykresy są zwracane
-#' jako lista subplotów dla łatwego umieszczenia w RMarkdown.
+#' Funkcja generuje interaktywne wykresy punktowe (scatter) dla wszystkich par kolumn
+#' numerycznych w ramce danych. Dodatkowo rysowane są elipsy obejmujące 95% punktów
+#' dla każdej grupy faktorowej. Wykresy są zwracane jako lista subplotów
+#' dla łatwego umieszczenia w RMarkdown.
 #'
 #' @param df Ramka danych zawierająca kolumny numeryczne do wizualizacji.
 #' @param factor_cols Wektor nazw kolumn jakościowych (faktorowych) do kolorowania
-#'   punktów (domyślnie NULL — wszystkie dane traktowane jako jedna grupa).
-#' @return Obiekt klasy \code{tagList} z listą subplotów \pkg{plotly}.
+#'   punktów i elips (domyślnie NULL — wszystkie dane traktowane jako jedna grupa).
+#' @return Obiekt klasy \code{list} z listą subplotów \pkg{plotly}.
 #' @examples
-#' plot_scatter_grid(mtcars, factor_cols = c("cyl"))
+#' plot_scatter_ellipse(mtcars, factor_cols = c("cyl"))
 #'
-plot_scatter_grid <- function(df, factor_cols = NULL) {
+plot_scatter_ellipse_grid <- function(df, factor_cols = NULL) {
   prep <- prepare_qualitative(df, factor_cols)
   df_local <- prep$df
   factor_cols <- prep$qualitative_cols
@@ -30,6 +30,7 @@ plot_scatter_grid <- function(df, factor_cols = NULL) {
       
       p <- ggplot(df_local, aes_string(x = x_col, y = y_col, color = f)) +
         geom_point(alpha = 0.7) +
+        stat_ellipse(level = 0.95) +
         ggthemes::theme_clean(base_size = 15) +
         labs(x = x_col, y = y_col, color = f)
       

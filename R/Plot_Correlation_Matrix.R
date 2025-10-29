@@ -25,7 +25,7 @@ plot_correlation_matrix<- function(df, method = "pearson", title = "Correlation 
   )
   ggplot(df_long, aes(x = Var1, y = Var2, fill = Correlation)) +
     geom_tile(color = "white") +
-    scale_fill_gradient2(low = "#619CFF", mid = "white", high = "#F8766D", midpoint = 0) +
+    scale_fill_gradient2(low = gg_color("blue"), mid = "white", high = gg_color("red"), midpoint = 0) +
     geom_text(aes(label = round(Correlation, 2)), size = 4) +
     theme_clean(base_size = 15) +
     labs(title = title, x = NULL, y = NULL) +

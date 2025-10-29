@@ -2,26 +2,26 @@
 % Please edit documentation in R/Plot_Scatter_Ellipse.R
 \name{plot_scatter_ellipse}
 \alias{plot_scatter_ellipse}
-\title{Tworzy siatkę wykresów punktowych z elipsami dla par kolumn numerycznych}
+\title{Tworzy interaktywny wykres punktowy z elipsą dla jednej pary kolumn numerycznych}
 \usage{
-plot_scatter_ellipse(df, factor_cols = NULL)
+plot_scatter_ellipse(df, x_col, y_col, factor_col = NULL)
 }
 \arguments{
 \item{df}{Ramka danych zawierająca kolumny numeryczne do wizualizacji.}
 
-\item{factor_cols}{Wektor nazw kolumn jakościowych (faktorowych) do kolorowania
-punktów i elips (domyślnie NULL — wszystkie dane traktowane jako jedna grupa).}
+\item{x_col}{Nazwa kolumny numerycznej dla osi X.}
+
+\item{y_col}{Nazwa kolumny numerycznej dla osi Y.}
+
+\item{factor_col}{Nazwa kolumny jakościowej (faktorowej) do kolorowania punktów i elips (domyślnie NULL).}
 }
 \value{
-Obiekt klasy \code{list} z listą subplotów \pkg{plotly}.
+Obiekt \pkg{plotly} z wykresem punktowym i elipsą.
 }
 \description{
-Funkcja generuje interaktywne wykresy punktowe (scatter) dla wszystkich par kolumn
-numerycznych w ramce danych. Dodatkowo rysowane są elipsy obejmujące 95% punktów
-dla każdej grupy faktorowej. Wykresy są zwracane jako lista subplotów
-dla łatwego umieszczenia w RMarkdown.
+Funkcja generuje wykres punktowy (scatter) dla jednej pary kolumn numerycznych.
+Dodatkowo rysowana jest elipsa obejmująca 95% punktów dla każdej grupy faktorowej.
 }
 \examples{
-plot_scatter_ellipse(mtcars, factor_cols = c("cyl"))
-
+plot_scatter_ellipse(mtcars, x_col = "mpg", y_col = "disp", factor_col = "cyl")
 }
