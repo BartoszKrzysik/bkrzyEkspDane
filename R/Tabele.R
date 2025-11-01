@@ -11,6 +11,10 @@ describe_df <- function(df) {
     pct_na = sapply(df, function(x) round(mean(is.na(x)) * 100, 2)),
     n_zero = sapply(df, function(x) if(is.numeric(x)) sum(x == 0, na.rm = TRUE) else NA),
     pct_zero = sapply(df, function(x) if(is.numeric(x)) round(mean(x == 0, na.rm = TRUE) * 100, 2) else NA),
+    n_empty = sapply(df, function(x) if(is.character(x) | is.factor(x)) sum(trimws(x) == "", na.rm = TRUE) else NA),
+    pct_empty = sapply(df, function(x) if(is.character(x) | is.factor(x)) round(mean(trimws(x) == "", na.rm = TRUE) * 100, 2) else NA),
+    n_null = sapply(df, function(x) if(is.list(x)) sum(sapply(x, is.null)) else NA),
+    pct_null = sapply(df, function(x) if(is.list(x)) round(mean(sapply(x, is.null)) * 100, 2) else NA),
     stringsAsFactors = FALSE,
     row.names = NULL
   )
