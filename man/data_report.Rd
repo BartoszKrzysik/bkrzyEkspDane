@@ -2,7 +2,7 @@
 % Please edit documentation in R/Data_Raport.R
 \name{data_report}
 \alias{data_report}
-\title{Generuje raport danych w formacie HTML}
+\title{Generuje interaktywny raport danych w formacie HTML}
 \usage{
 data_report(
   df,
@@ -16,40 +16,41 @@ data_report(
 \arguments{
 \item{df}{Ramka danych (`data.frame` lub tibble), dla której ma zostać wygenerowany raport.}
 
-\item{file}{Nazwa pliku wyjściowego HTML (domyślnie "data_report.html").}
+\item{file}{Nazwa pliku wyjściowego HTML (domyślnie `"data_report.html"`).}
 
-\item{title}{Tytuł raportu (domyślnie "Raport danych").}
+\item{title}{Tytuł raportu (domyślnie `"Raport danych"`).}
 
 \item{author}{(Opcjonalnie) Imię i nazwisko autora raportu.}
 
-\item{location}{(Opcjonalnie) Miejscowość lub lokalizacja, która ma się pojawić w raporcie.}
+\item{location}{(Opcjonalnie) Lokalizacja lub miejscowość, która ma się pojawić w raporcie.}
 
 \item{open}{Logiczna wartość: jeśli TRUE, raport zostanie automatycznie otwarty w przeglądarce po wygenerowaniu (domyślnie FALSE).}
 }
 \value{
-Zapisuje plik HTML w bieżącym katalogu roboczym i zwraca ścieżkę do pliku.
+Zapisuje plik HTML w bieżącym katalogu roboczym i zwraca ścieżkę do pliku.  
   Jeśli `open = TRUE`, plik zostanie również otwarty w domyślnej przeglądarce.
 }
 \description{
-Funkcja tworzy raport z wybranej ramki danych (`data.frame`) w formacie HTML.
-Raport zawiera m.in.:
+Funkcja tworzy raport z wybranej ramki danych (`data.frame`) w formacie HTML, wykorzystując
+interaktywne tabele `reactable`. Wszystkie sekcje raportu są interaktywne:
+tabele można sortować, filtrować, a dane numeric/factor/character mogą być filtrowane
+przy pomocy suwaków i selektorów Crosstalk. Raport zawiera m.in.:
 \itemize{
   \item wymiary danych,
-  \item nazwy i typy kolumn,
-  \item brakujące wartości (NA) i liczby zer w kolumnach numerycznych,
-  \item statystyki opisowe kolumn numerycznych,
-  \item najczęstsze i najrzadsze wartości w kolumnach tekstowych lub faktorowych,
-  \item korelacje między kolumnami numerycznymi,
-  \item sessionInfo(),
-  \item dodatkowe informacje o autorze i miejscowości (opcjonalnie).
+  \item strukturę tabeli (`describe_df`),
+  \item statystyki opisowe kolumn numerycznych (`describe_stats`),
+  \item interaktywne wyświetlenie całych danych z filtrami,
+  \item liczności kategorii dla kolumn tekstowych lub faktorowych (`reactable_counts`),
+  \item informacje o sesji (`sessionInfo()`),
+  \item stopkę z informacjami o pakiecie i autorze raportu.
 }
 }
 \details{
-Funkcja automatycznie konwertuje tibbles lub inne obiekty dziedziczące po `data.frame`
-  na klasyczny `data.frame`, aby zapewnić pełną kompatybilność z pakietem `reactable`.
+Funkcja konwertuje tibbles lub inne obiekty dziedziczące po `data.frame` na klasyczny `data.frame`,
+  aby zapewnić pełną kompatybilność z pakietem `reactable`. Wszystkie tabele w raporcie są
+  interaktywne i zachowują formatowanie z funkcji `describe_df()`, `describe_stats()` oraz `reactable_counts()`.
 
-  Raport generowany jest za pomocą `rmarkdown` i pakietu `reactable`, co umożliwia
-  interaktywną prezentację tabel (sortowanie, filtrowanie).
+  Sekcja danych umożliwia filtrowanie wartości numeric/factor/character przy użyciu suwaków i selektorów Crosstalk.
 }
 \examples{
 \dontrun{
@@ -57,7 +58,7 @@ library(nycflights13)
 # Raport podstawowy
 data_report(flights)
 
-# Raport z autorem i miejscowością, otwarty w przeglądarce
+# Raport z autorem i lokalizacją, otwarty w przeglądarce
 data_report(
   flights,
   title = "Raport o danych lotniczych",
