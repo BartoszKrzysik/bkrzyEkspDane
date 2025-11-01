@@ -1,33 +1,34 @@
-#' Generuje raport danych w formacie HTML
+#' Generuje interaktywny raport danych w formacie HTML
 #'
-#' Funkcja tworzy raport z wybranej ramki danych (`data.frame`) w formacie HTML.
-#' Raport zawiera m.in.:
+#' Funkcja tworzy raport z wybranej ramki danych (`data.frame`) w formacie HTML, wykorzystując
+#' interaktywne tabele `reactable`. Wszystkie sekcje raportu są interaktywne:
+#' tabele można sortować, filtrować, a dane numeric/factor/character mogą być filtrowane
+#' przy pomocy suwaków i selektorów Crosstalk. Raport zawiera m.in.:
 #' \itemize{
 #'   \item wymiary danych,
-#'   \item nazwy i typy kolumn,
-#'   \item brakujące wartości (NA) i liczby zer w kolumnach numerycznych,
-#'   \item statystyki opisowe kolumn numerycznych,
-#'   \item najczęstsze i najrzadsze wartości w kolumnach tekstowych lub faktorowych,
-#'   \item korelacje między kolumnami numerycznymi,
-#'   \item sessionInfo(),
-#'   \item dodatkowe informacje o autorze i miejscowości (opcjonalnie).
+#'   \item strukturę tabeli (`describe_df`),
+#'   \item statystyki opisowe kolumn numerycznych (`describe_stats`),
+#'   \item interaktywne wyświetlenie całych danych z filtrami,
+#'   \item liczności kategorii dla kolumn tekstowych lub faktorowych (`reactable_counts`),
+#'   \item informacje o sesji (`sessionInfo()`),
+#'   \item stopkę z informacjami o pakiecie i autorze raportu.
 #' }
 #'
 #' @param df Ramka danych (`data.frame` lub tibble), dla której ma zostać wygenerowany raport.
-#' @param file Nazwa pliku wyjściowego HTML (domyślnie "data_report.html").
-#' @param title Tytuł raportu (domyślnie "Raport danych").
+#' @param file Nazwa pliku wyjściowego HTML (domyślnie `"data_report.html"`).
+#' @param title Tytuł raportu (domyślnie `"Raport danych"`).
 #' @param author (Opcjonalnie) Imię i nazwisko autora raportu.
-#' @param location (Opcjonalnie) Miejscowość lub lokalizacja, która ma się pojawić w raporcie.
+#' @param location (Opcjonalnie) Lokalizacja lub miejscowość, która ma się pojawić w raporcie.
 #' @param open Logiczna wartość: jeśli TRUE, raport zostanie automatycznie otwarty w przeglądarce po wygenerowaniu (domyślnie FALSE).
 #'
-#' @return Zapisuje plik HTML w bieżącym katalogu roboczym i zwraca ścieżkę do pliku.
+#' @return Zapisuje plik HTML w bieżącym katalogu roboczym i zwraca ścieżkę do pliku.  
 #'   Jeśli `open = TRUE`, plik zostanie również otwarty w domyślnej przeglądarce.
 #'
-#' @details Funkcja automatycznie konwertuje tibbles lub inne obiekty dziedziczące po `data.frame`
-#'   na klasyczny `data.frame`, aby zapewnić pełną kompatybilność z pakietem `reactable`.
+#' @details Funkcja konwertuje tibbles lub inne obiekty dziedziczące po `data.frame` na klasyczny `data.frame`,
+#'   aby zapewnić pełną kompatybilność z pakietem `reactable`. Wszystkie tabele w raporcie są
+#'   interaktywne i zachowują formatowanie z funkcji `describe_df()`, `describe_stats()` oraz `reactable_counts()`.
 #'
-#'   Raport generowany jest za pomocą `rmarkdown` i pakietu `reactable`, co umożliwia
-#'   interaktywną prezentację tabel (sortowanie, filtrowanie).
+#'   Sekcja danych umożliwia filtrowanie wartości numeric/factor/character przy użyciu suwaków i selektorów Crosstalk.
 #'
 #' @examples
 #' \dontrun{
@@ -35,7 +36,7 @@
 #' # Raport podstawowy
 #' data_report(flights)
 #'
-#' # Raport z autorem i miejscowością, otwarty w przeglądarce
+#' # Raport z autorem i lokalizacją, otwarty w przeglądarce
 #' data_report(
 #'   flights,
 #'   title = "Raport o danych lotniczych",
@@ -46,6 +47,8 @@
 #' }
 #'
 #' @export
+
+
 data_report <- function(df, 
                         file = "data_report.html", 
                         title = "Raport danych", 
@@ -54,14 +57,6 @@ data_report <- function(df,
                         open = FALSE) {
   
   tmp_rmd <- tempfile(fileext = ".Rmd")
-  after_html <- tempfile(fileext = ".html")
-  
-  footer_text <- paste0(
-    "<hr>\n",
-    "<p>Raport wygenerowany przez pakiet <a href='https://github.com/BartoszKrzysik/bkrzyEkspDane.git'>bkrzyEkspDane</a> na licencji MIT.</p>\n",
-    "<p>Korzysta z pakietów open-source: ggthemes, ggplot2, plotly, ggpubr, dplyr, GGally, reactable, rmarkdown, flexdashboard.</p>\n"
-  )
-  writeLines(footer_text, after_html)
   
   yaml_header <- paste0(
     "---\n",
@@ -74,164 +69,139 @@ data_report <- function(df,
     "    toc: true\n",
     "    toc_depth: 3\n",
     "    toc_float: true\n",
-    "    includes:\n",
-    "      after_body: '", after_html, "'\n",
     "---\n\n"
   )
-  rmd_text <- paste0(
-    yaml_header,
+  
+  setup_block <- paste0(
     "```{r setup, include=FALSE}\n",
-    "library(reactable)\n",
     "library(dplyr)\n",
+    "library(reactable)\n",
+    "library(crosstalk)\n",
+    "library(reactablefmtr)\n",
+    "library(htmltools)\n",
     "knitr::opts_chunk$set(echo = FALSE)\n",
-    "df <- ", deparse(substitute(df)), "\n",
-    "df <- as.data.frame(df)\n",
-    "```\n\n",
-    
-    "# Podstawowe dane\n\n",
-    
+    "df <- as.data.frame(", deparse(substitute(df)), ")\n",
+    "```\n\n"
+  )
+  style_block <- "
+    <style>
+    body {
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+    .container {
+      max-width: 100% !important;
+    }
+    </style>
+    "
+  dimension_block <- paste0(
     "## Wymiary danych\n\n",
-    "```{r}\n",
-    "reactable(data.frame(\n",
-    "  Metryka = c('Liczba wierszy', 'Liczba kolumn'),\n",
-    "  Wartość = as.character(c(nrow(df), ncol(df)))\n",
-    "))\n",
-    "```\n\n",
-    
-    "## Nazwy kolumn w danych\n\n",
-    "```{r}\n",
-    "reactable(data.frame(ID = seq_along(df), Kolumna = names(df)))\n",
-    "```\n\n",
-    
-    "## Struktura danych `str()` \n\n",
-    "```{r}\n",
-    "str(df)\n",
-    "```\n\n",
-    
-    "## Podsumowanie danych `summary()` \n\n",
-    "```{r}\n",
-    "summary(df)\n",
-    "```\n\n",
-    
-    "# Potencjalne błędy\n\n",
-    
-    "## Braki danych (NA)\n\n",
-    "```{r}\n",
-    "na_count <- colSums(is.na(df))\n",
-    "na_percent <- round(100 * na_count / nrow(df), 2)\n",
-    "reactable(data.frame(\n",
-    "  ID = seq_along(na_count),\n",
-    "  Kolumna = names(na_count),\n",
-    "  NA_count = as.integer(na_count),\n",
-    "  NA_percent = na_percent\n",
-    "))\n",
-    "```\n\n",
-    
-    "## Liczba zer w kolumnach numerycznych\n\n",
-    "```{r}\n",
-    "zero_count <- sapply(df, function(x) if(is.numeric(x)) sum(x == 0, na.rm = TRUE) else NA)\n",
-    "zero_percent <- round(100 * zero_count / nrow(df), 2)\n",
-    "reactable(data.frame(\n",
-    "  ID = seq_along(zero_count),\n",
-    "  Kolumna = names(zero_count),\n",
-    "  Zero_count = as.integer(zero_count),\n",
-    "  Zero_percent = zero_percent\n",
-    "))\n",
-    "```\n\n",
-    
-    "# Dane\n\n",
-    
-    "## Typy zmiennych\n\n",
-    "```{r}\n",
-    "reactable(data.frame(ID = seq_along(df), Kolumna = names(df), Typ = sapply(df, function(x) class(x)[1])))\n",
-    "```\n\n",
-    
-    "## Liczba unikalnych wartości w kolumnach\n\n",
-    "```{r}\n",
-    "unique_count <- sapply(df, function(x) length(unique(x)))\n",
-    "reactable(data.frame(ID = seq_along(unique_count), Kolumna = names(unique_count), Unique_count = unique_count))\n",
-    "```\n\n",
-    
-    "## Najczęstsze wartości w kolumnach faktorowych lub character\n\n",
-    "```{r}\n",
-    "most_common <- lapply(seq_along(df), function(i) {\n",
-    "  x <- df[[i]]\n",
-    "  if(is.factor(x) || is.character(x)) {\n",
-    "    tab <- sort(table(x), decreasing = TRUE)[1:min(3, length(unique(x)))]\n",
-    "    data.frame(ID = i, Kolumna = names(df)[i], Wartość = names(tab), Liczność = as.integer(tab), stringsAsFactors = FALSE)\n",
-    "  } else NULL\n",
-    "}) %>% bind_rows()\n",
-    "if(nrow(most_common) > 0) reactable(most_common) else 'Brak kolumn tekstowych lub faktorowych.'\n",
-    "```\n\n",
-    
-    "## Najrzadsze wartości w kolumnach faktorowych lub character\n\n",
-    "```{r}\n",
-    "rarest_values <- lapply(seq_along(df), function(i) {\n",
-    "  x <- df[[i]]\n",
-    "  if(is.factor(x) || is.character(x)) {\n",
-    "    tab <- sort(table(x), decreasing = FALSE)[1:min(3, length(unique(x)))]\n",
-    "    data.frame(ID = i, Kolumna = names(df)[i], Wartość = names(tab), Liczność = as.integer(tab), stringsAsFactors = FALSE)\n",
-    "  } else NULL\n",
-    "}) %>% bind_rows()\n",
-    "if(nrow(rarest_values) > 0) reactable(rarest_values) else 'Brak kolumn tekstowych lub faktorowych.'\n",
-    "```\n\n",
-    
-    "## Podstawowe statystyki kolumn numerycznych\n\n",
-    "```{r}\n",
-    "num_stats <- df[, sapply(df, is.numeric), drop = FALSE]\n",
-    "if(ncol(num_stats) > 0) {\n",
-    "  summary_stats <- data.frame(\n",
-    "    ID = seq_along(num_stats),\n",
-    "    Kolumna = names(num_stats),\n",
-    "    Mean = round(sapply(num_stats, mean, na.rm = TRUE), 3),\n",
-    "    Median = round(sapply(num_stats, median, na.rm = TRUE), 3),\n",
-    "    SD = round(sapply(num_stats, sd, na.rm = TRUE), 3),\n",
-    "    Min = round(sapply(num_stats, min, na.rm = TRUE), 3),\n",
-    "    Max = round(sapply(num_stats, max, na.rm = TRUE), 3),\n",
-    "    Q1 = round(sapply(num_stats, quantile, 0.25, na.rm = TRUE), 3),\n",
-    "    Q3 = round(sapply(num_stats, quantile, 0.75, na.rm = TRUE), 3),\n",
-    "    stringsAsFactors = FALSE\n",
-    "  )\n",
-    "  reactable(summary_stats)\n",
-    "} else {\n",
-    "  'Brak kolumn numerycznych w danych'\n",
-    "}\n",
-    "```\n\n",
-    
-    "## Korelacje między kolumnami numerycznymi\n\n",
-    "```{r}\n",
-    "if(ncol(num_stats) > 1) {\n",
-    "  cor_mat <- round(cor(num_stats, use = 'pairwise.complete.obs'), 3)\n",
-    "  reactable(cbind(ID = seq_len(nrow(cor_mat)), as.data.frame(cor_mat)), rownames = TRUE)\n",
-    "} else {\n",
-    "  'Brak wystarczającej liczby kolumn numerycznych do obliczenia korelacji.'\n",
-    "}\n",
-    "```\n\n",
-    
-    "## Liczności kategorii dla kolumn faktorowych\n\n",
-    "```{r}\n",
-    "factor_cols <- df[, sapply(df, is.factor), drop = FALSE]\n",
-    "if(ncol(factor_cols) > 0) {\n",
-    "  lapply(factor_cols, table)\n",
-    "} else {\n",
-    "  'Brak kolumn faktorowych w danych'\n",
-    "}\n",
-    "```\n\n",
-    
-    "## Liczności kategorii dla kolumn character\n\n",
-    "```{r}\n",
-    "char_cols <- df[, sapply(df, is.character), drop = FALSE]\n",
-    "if(ncol(char_cols) > 0) {\n",
-    "  lapply(char_cols, table)\n",
-    "} else {\n",
-    "  'Brak kolumn character w danych'\n",
-    "}\n",
-    "```\n",
-    
+    "```{r wymiar}\n",
+    "reactable(\n",
+    "  data.frame(Metryka = c('Liczba wierszy', 'Liczba kolumn'), Wartość = as.character(c(nrow(df), ncol(df)))),\n",
+    "  defaultColDef = colDef(vAlign = 'center', align = 'left', width = 125),\n",
+    "  striped = TRUE, pagination = TRUE, defaultPageSize = 15, highlight = TRUE, bordered = TRUE,\n",
+    "  style = list(width = '253px', margin = '0 auto')\n",
+    ")\n",
+    "```\n\n"
+  )
+  
+  str_block <- paste0(
+    "# Struktura tabeli\n\n",
+    "```{r str}\n",
+    "reactable(describe_df(df),\n",
+    "  defaultColDef = colDef(vAlign = 'center', align = 'left'),\n",
+    "  columns = list(\n",
+    "    col_index = colDef(name = 'Index', width = 60),\n",
+    "    col_name = colDef(name = 'Nazwa kolumny', width = 150),\n",
+    "    typeof = colDef(name = 'Typ', width = 100),\n",
+    "    class = colDef(name = 'Klasa', width = 100),\n",
+    "    n_unique = colDef(name = 'Unikalne', width = 100),\n",
+    "    n_na = colDef(name = 'Ilość NaN', width = 100),\n",
+    "    pct_na = colDef(name = 'Procent NaN', cell = function(value) paste0(value, '%'), width = 100),\n",
+    "    n_zero = colDef(name = 'Ilość zer', width = 80),\n",
+    "    pct_zero = colDef(name = 'Procent zer', cell = function(value) paste0(value, '%'), width = 100)\n",
+    "  ),\n",
+    "  striped = TRUE, pagination = TRUE, defaultPageSize = 15, highlight = TRUE, bordered = TRUE\n",
+    ") %>% add_title('Struktura tabeli (str)', margin = margin(0, 0, 10, 0))\n",
+    "```\n\n"
+  )
+  
+  summary_block <- paste0(
+    "# Statystyki tabeli\n\n",
+    "```{r summary}\n",
+    "reactable(describe_stats(df),\n",
+    "  defaultColDef = colDef(vAlign = 'center', align = 'left'),\n",
+    "  columns = list(\n",
+    "    col_index = colDef(name = 'Index', width = 60),\n",
+    "    col_name = colDef(name = 'Nazwa kolumny', width = 150),\n",
+    "    mean = colDef(name = 'Średnia', width = 70),\n",
+    "    mode = colDef(name = 'Moda', width = 70),\n",
+    "    min = colDef(name = 'Minimum', width = 80),\n",
+    "    Q1 = colDef(name = 'Q1', width = 65),\n",
+    "    median = colDef(name = 'Median (Q2)', width = 75),\n",
+    "    Q3 = colDef(name = 'Q3', width = 65),\n",
+    "    max = colDef(name = 'Maksimum', width = 90),\n",
+    "    sd = colDef(name = 'Odchylenie standardowe', width = 105),\n",
+    "    IQR = colDef(name = 'IQR', width = 70)\n",
+    "  ),\n",
+    "  columnGroups = list(\n",
+    "    colGroup(name = 'Kwantyle', columns = c('Q1', 'median', 'Q3')),\n",
+    "    colGroup(name = 'Zakres', columns = c('min', 'max'))\n",
+    "  ),\n",
+    "  striped = TRUE, pagination = TRUE, defaultPageSize = 15, highlight = TRUE, bordered = TRUE\n",
+    ") %>% add_title('Statystyki tabeli (summary)', margin = margin(0, 0, 10, 0))\n",
+    "```\n\n"
+  )
+  
+  data_block <- paste0(
+    "# Dane interaktywne\n\n",
+    "```{r data}\n",
+    "dane <- SharedData$new(df)\n",
+    "tbl <- reactable(dane,\n",
+    "  defaultColDef = colDef(vAlign = 'center', align = 'left'),\n",
+    "  striped = TRUE, pagination = TRUE, defaultPageSize = 15, highlight = TRUE, bordered = TRUE\n",
+    ")\n",
+    "div(bscols(c(\n",
+    "  make_character_selects(dane, df),\n",
+    "  make_numeric_sliders(dane, df),\n",
+    "  make_factor_checkboxes(dane, df)\n",
+    ")))\n",
+    "div(tbl)\n",
+    "```\n\n"
+  )
+  
+  reactable_counts_block <- paste0(
+    "# Liczności kategorii dla kolumn tekstowych\n\n",
+    "```{r reactable_counts}\n",
+    "reactable_counts(df)\n",
+    "```\n"
+  )
+  
+  session_block <- paste0(
     "# Session info\n\n",
     "```{r}\n",
     "sessionInfo()\n",
     "```\n"
+  )
+  
+  footer_text <- paste0(
+    "<hr>\n",
+    "<p>Raport wygenerowany przez pakiet <a href='https://github.com/BartoszKrzysik/bkrzyEkspDane.git'>bkrzyEkspDane</a> na licencji MIT.</p>\n",
+    "<p>Korzysta z pakietów open-source: ggthemes, ggplot2, plotly, ggpubr, dplyr, GGally, reactable, rmarkdown, flexdashboard.</p>\n"
+  )
+  
+  rmd_text <- paste0(
+    yaml_header,
+    setup_block,
+    style_block,
+    dimension_block,
+    str_block,
+    summary_block,
+    data_block,
+    reactable_counts_block,
+    session_block,
+    footer_text
   )
   
   writeLines(rmd_text, tmp_rmd)
@@ -241,5 +211,5 @@ data_report <- function(df,
   
   message("Raport zapisany do pliku: ", output_path)
   
-  if (open) browseURL(output_path)
+  if(open) browseURL(output_path)
 }
