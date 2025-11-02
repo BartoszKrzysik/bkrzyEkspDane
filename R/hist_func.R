@@ -31,30 +31,32 @@ compute_binwidth <- function(x, max_unique = 30) {
 }
 
 compute_bins <- function(x, group = NULL, binwidth = NULL) {
-  x <- x[!is.na(x)]
+  mask <- !is.na(x)
+  x <- x[mask]
+  group_vals <- if (is.null(group)) "All" else group[mask]
+
   if (length(x) == 0) return(NULL)
 
   if (is.null(binwidth)) binwidth <- compute_binwidth(x)
 
   bin_breaks <- seq(floor(min(x)), ceiling(max(x)) + binwidth, by = binwidth)
-  xmin_vec <- bin_breaks[-length(bin_breaks)]
-  xmax_vec <- bin_breaks[-1]
-  bin_labels <- paste0("[", xmin_vec, " – ", xmax_vec, ")")
-  bin_index <- cut(x, breaks = bin_breaks, labels = seq_along(xmin_vec), right = FALSE, include.lowest = TRUE)
-  bin_index_num <- as.integer(bin_index)
+  bin_labels <- paste0("[", bin_breaks[-length(bin_breaks)], " – ", bin_breaks[-1], ")")
+
+  bin_index <- cut(x, breaks = bin_breaks, labels = bin_labels, right = FALSE, include.lowest = TRUE)
 
   df_bins <- data.frame(
     x = x,
-    fill = if (is.null(group)) "All" else group[!is.na(x)],
-    bin = bin_labels[bin_index_num],
-    xmin = xmin_vec[bin_index_num],
-    xmax = xmax_vec[bin_index_num]
+    fill = group_vals,
+    bin = bin_index,
+    stringsAsFactors = FALSE
   )
 
   df_bins <- df_bins %>%
-    dplyr::group_by(fill, bin, xmin, xmax) %>%
-    dplyr::summarise(count = n(), .groups = "drop") %>%
+    dplyr::group_by(fill, bin) %>%
+    dplyr::summarise(count = length(x), .groups = "drop") %>%
     dplyr::mutate(
+      xmin = as.numeric(sub(".*\\[| –.*", "", bin)),
+      xmax = as.numeric(sub(".*– |\\)", "", bin)),
       text = paste0("Zakres: [", xmin, " – ", xmax, ")<br>Ilość: ", count)
     )
 
