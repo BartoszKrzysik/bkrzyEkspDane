@@ -1,7 +1,7 @@
 Package: bkrzyEkspDane
 Type: Package
 Title: Eksploracyjna wizualizacja danych
-Version: 0.2.8
+Version: 0.2.9
 Author: Bartosz Krzysik [aut, cre]
 Maintainer: Bartosz Krzysik <b.krzysik2@gmail.com>
 Description: Zestaw funkcji do eksploracyjnej wizualizacji danych w R.
@@ -14,6 +14,7 @@ Imports:
     plotly,
     ggpubr,
     dplyr,
+    tidyr,
     GGally,
     htmltools,
     rmarkdown,
