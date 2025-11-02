@@ -44,7 +44,7 @@ plot_hist_grid_logY <- function(df, factor_cols = NULL) {
       
       df_bins <- df_local %>%
         select(all_of(c(f, n))) %>%
-        drop_na() %>%
+        tidyr::drop_na() %>%
         group_by(!!sym(f)) %>%
         mutate(bin = cut(!!sym(n), breaks = seq(min(!!sym(n)), max(!!sym(n)) + binwidth, by = binwidth), right = FALSE)) %>%
         group_by(!!sym(f), bin) %>%
