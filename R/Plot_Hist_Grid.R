@@ -12,40 +12,58 @@
 #' @examples
 #' plot_hist_grid(mtcars, factor_cols = c("cyl"))
 #'
+library(ggplot2)
+library(plotly)
+library(dplyr)
+library(ggthemes)
+
 plot_hist_grid <- function(df, factor_cols = NULL) {
   prep <- prepare_qualitative(df, factor_cols)
   df_local <- prep$df
   factor_cols <- prep$qualitative_cols
   
   numeric_cols <- names(df_local)[sapply(df_local, is.numeric)]
-  if(length(numeric_cols) == 0) return(NULL)
+  if (length(numeric_cols) == 0) return(NULL)
   
   plots <- list()
   
   for (f in factor_cols) {
     for (n in numeric_cols) {
-      x_vals <- df_local[[n]]
-      unique_vals <- length(unique(x_vals[!is.na(x_vals)]))
+      x_vals <- na.omit(df_local[[n]])
+      unique_vals <- length(unique(x_vals))
       
       if (unique_vals <= 30) {
-        p <- ggplot(df_local, aes_string(x = n, fill = f)) +
-          geom_histogram(color = "black", alpha = 0.7, binwidth = 1) +
-          facet_wrap(as.formula(paste("~", f)), scales = "free") +
-          ggthemes::theme_clean(base_size = 15) +
-          xlab(n) +
-          ylab("Count")
+        binwidth <- 1
       } else {
-        p <- ggplot(df_local, aes_string(x = n, fill = f)) +
-          geom_histogram(color = "black", alpha = 0.7) +
-          facet_wrap(as.formula(paste("~", f)), scales = "free") +
-          ggthemes::theme_clean(base_size = 15) +
-          xlab(n) +
-          ylab("Count")
+        iqr <- IQR(x_vals)
+        n_obs <- length(x_vals)
+        binwidth <- 2 * iqr / (n_obs)^(1/3)
+        if (binwidth == 0 || is.na(binwidth)) {
+          binwidth <- diff(range(x_vals)) / 30
+        }
       }
       
-      plots <- c(plots, list(ggplotly(p)))
+      bins <- ggplot_build(
+        ggplot(df_local, aes_string(x = n, fill = f)) +
+          geom_histogram(binwidth = binwidth)
+      )$data[[1]]
+      
+        mutate(
+          range = paste0("[", signif(xmin, 4), " – ", signif(xmax, 4), ")"),
+          text = paste("Zakres:", range, "<br>Ilość:", count)
+        )
+      
+      p <- ggplot(df_bins, aes(x = x, y = count, fill = fill, text = text)) +
+        geom_col(color = "black", alpha = 0.7, width = binwidth) +
+        facet_wrap(as.formula(paste("~", f)), scales = "free") +
+        ggthemes::theme_clean(base_size = 15) +
+        xlab(n) +
+        ylab("Count")
+      
+      plots <- c(plots, list(ggplotly(p, tooltip = "text")))
     }
   }
   
   return(plots)
 }
+

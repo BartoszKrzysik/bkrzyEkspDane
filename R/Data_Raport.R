@@ -83,17 +83,20 @@ data_report <- function(df,
     "df <- as.data.frame(", deparse(substitute(df)), ")\n",
     "```\n\n"
   )
-  style_block <- "
-    <style>
-    body {
-      margin-left: 10px;
-      margin-right: 10px;
-    }
-    .container {
-      max-width: 100% !important;
-    }
-    </style>
-    "
+  style_block <- paste0(
+    "```{r, results='asis', echo=FALSE}\n",
+    "htmltools::tags$style(HTML('\n",
+    "  body {\n",
+    "    margin-left: 10px;\n",
+    "    margin-right: 10px;\n",
+    "  }\n",
+    "  .container {\n",
+    "    max-width: 100% !important;\n",
+    "  }\n",
+    "'))\n",
+    "```\n\n"
+  )
+
   dimension_block <- paste0(
     "## Wymiary danych\n\n",
     "```{r wymiar}\n",
