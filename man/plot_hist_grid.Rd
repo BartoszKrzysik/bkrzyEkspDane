@@ -4,7 +4,7 @@
 \alias{plot_hist_grid}
 \title{Tworzy siatkę histogramów dla kolumn numerycznych}
 \usage{
-plot_hist_grid(df, factor_cols = NULL)
+plot_hist_grid(df, factor_cols = NULL, log_y = FALSE)
 }
 \arguments{
 \item{df}{Ramka danych zawierająca kolumny numeryczne do wizualizacji.}
