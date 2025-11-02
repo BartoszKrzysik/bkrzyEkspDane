@@ -18,47 +18,14 @@ compute_binwidth <- function(x, max_unique = 30) {
   } else {
     iqr_val <- IQR(x)
     n_obs <- length(x)
-    binwidth <- 2 * iqr_val / (n_obs)^(1/3)
+    binwidth <- 2 * iqr_val / (n_obs)^(1/2)
 
     if (binwidth <= 0 || is.na(binwidth)) {
       binwidth <- diff(range(x)) / 30
     }
 
-    binwidth <- signif(binwidth, digits = decimal_precision(x) + 1)
+    binwidth <- signif_half_up(binwidth, digits = decimal_precision(x))
   }
 
   return(binwidth)
-}
-
-compute_bins <- function(x, group = NULL, binwidth = NULL) {
-  mask <- !is.na(x)
-  x <- x[mask]
-  group_vals <- if (is.null(group)) "All" else group[mask]
-
-  if (length(x) == 0) return(NULL)
-
-  if (is.null(binwidth)) binwidth <- compute_binwidth(x)
-
-  bin_breaks <- seq(floor(min(x)), ceiling(max(x)) + binwidth, by = binwidth)
-  bin_labels <- paste0("[", bin_breaks[-length(bin_breaks)], " – ", bin_breaks[-1], ")")
-
-  bin_index <- cut(x, breaks = bin_breaks, labels = bin_labels, right = FALSE, include.lowest = TRUE)
-
-  df_bins <- data.frame(
-    x = x,
-    fill = group_vals,
-    bin = bin_index,
-    stringsAsFactors = FALSE
-  )
-
-  df_bins <- df_bins %>%
-    dplyr::group_by(fill, bin) %>%
-    dplyr::summarise(count = length(x), .groups = "drop") %>%
-    dplyr::mutate(
-      xmin = as.numeric(sub(".*\\[| –.*", "", bin)),
-      xmax = as.numeric(sub(".*– |\\)", "", bin)),
-      text = paste0("Zakres: [", xmin, " – ", xmax, ")<br>Ilość: ", count)
-    )
-
-  return(df_bins)
 }
