@@ -24,8 +24,16 @@ plot_hist_grid_logY <- function(df, factor_cols = NULL) {
   plots <- list()
   for (f in factor_cols) {
     for (n in numeric_cols) {
+      x_vals <- df_local[[n]]
+      unique_vals <- length(unique(x_vals[!is.na(x_vals)]))
+      
+      if (unique_vals <= 10) {
+        geom_hist <- geom_histogram(color = "black", alpha = 0.7, binwidth = 1)
+      } else {
+        geom_hist <- geom_histogram(color = "black", alpha = 0.7)
+      }
       p <- ggplot(df_local, aes_string(x = n, fill = f)) +
-        geom_histogram(color = "black", alpha = 0.7) +
+        geom_hist + 
         facet_wrap(as.formula(paste("~", f)), scales = "free") +
         scale_y_log10() +
         ggthemes::theme_clean(base_size = 15) +

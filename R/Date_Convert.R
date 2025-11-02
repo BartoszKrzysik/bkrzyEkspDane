@@ -25,6 +25,9 @@ date_convert <- function(df, cols) {
       warning(paste("Kolumna", col, "nie istnieje w ramce danych. Pomijam."))
       next
     }
+    if (is.numeric(df_new[[col]])) {
+      df_new[[col]] <- as.character(df_new[[col]])
+    }
     parsed <- parse_date_time(df_new[[col]], orders = possible_formats, quiet = TRUE)
     
     if (any(is.na(parsed)) && grepl("^\\d{4}[./-]\\d{2}$", df_new[[col]][1])) {

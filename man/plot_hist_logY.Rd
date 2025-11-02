@@ -4,7 +4,7 @@
 \alias{plot_hist_logY}
 \title{Tworzy interaktywny histogram z logarytmiczną skalą osi Y dla pojedynczej kolumny}
 \usage{
-plot_hist_logY(df, column, factor_cols = NULL)
+plot_hist_logY(df, column, factor_cols, bins = NULL, binwidth = NULL)
 }
 \arguments{
 \item{df}{Ramka danych zawierająca kolumnę numeryczną do wizualizacji.}

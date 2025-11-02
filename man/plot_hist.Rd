@@ -4,7 +4,7 @@
 \alias{plot_hist}
 \title{Tworzy interaktywny histogram dla pojedynczej kolumny}
 \usage{
-plot_hist(df, column, factor_cols = NULL)
+plot_hist(df, column, factor_cols, bins = NULL, binwidth = NULL)
 }
 \arguments{
 \item{df}{Ramka danych zawierająca kolumnę numeryczną do wizualizacji.}

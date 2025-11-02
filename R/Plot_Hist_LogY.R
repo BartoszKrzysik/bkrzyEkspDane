@@ -12,7 +12,7 @@
 #' @examples
 #' plot_hist_logY(mtcars, column = "mpg", factor_cols = c("cyl"))
 #' @export
-plot_hist_logY <- function(df, column, factor_cols = NULL) {
+plot_hist_logY <- function(df, column, factor_cols, bins = NULL, binwidth = NULL) {
   prep <- prepare_qualitative(df, factor_cols)
   df_local <- prep$df
   factor_cols <- prep$qualitative_cols
@@ -20,23 +20,27 @@ plot_hist_logY <- function(df, column, factor_cols = NULL) {
   if (!column %in% names(df_local)) stop("Kolumna ", column, " nie istnieje w df")
   if (!is.numeric(df_local[[column]])) stop("Kolumna ", column, " nie jest numeryczna")
   
-  if (length(factor_cols) == 0 || identical(factor_cols, "All")) {
-    p <- ggplot(df_local, aes_string(x = column)) +
-      geom_histogram(color = "black", fill = gg_color("blue"), alpha = 0.7) +
-      scale_y_log10() +
-      ggthemes::theme_clean(base_size = 15) +
-      xlab(column) +
-      ylab("Count (log scale)")
-  } else {
-    f <- factor_cols[1]
-    p <- ggplot(df_local, aes_string(x = column, fill = f)) +
-      geom_histogram(color = "black", alpha = 0.7) +
-      facet_wrap(as.formula(paste("~", f)), scales = "free") +
-      scale_y_log10() +
-      ggthemes::theme_clean(base_size = 15) +
-      xlab(column) +
-      ylab("Count (log scale)")
+  x <- df_local[[column]]
+  
+  if (is.null(binwidth)) {
+    if (length(unique(x)) <= 20) {
+      binwidth <- 1
+    } else {
+      binwidth <- 2 * IQR(x, na.rm = TRUE) / (length(x)^(1/3))
+      if (is.na(binwidth) || binwidth == 0) binwidth <- diff(range(x, na.rm = TRUE)) / 30
+    }
   }
+  
+  f <- factor_cols[1]
+  
+  p <- ggplot(df_local, aes_string(x = column, fill = f)) +
+    geom_histogram(color = "black", alpha = 0.7,
+                   binwidth = binwidth, bins = bins) +
+    facet_wrap(as.formula(paste("~", f)), scales = "free") +
+    scale_y_log10() +
+    ggthemes::theme_clean(base_size = 15) +
+    xlab(column) +
+    ylab("Count (log scale)")
   
   return(plotly::ggplotly(p))
 }
